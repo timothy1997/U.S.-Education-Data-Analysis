@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 # Row 1: State; Row 2: Year; Row 3: Enroll; Row 4: Total Revenue; Row 5: Federal Revenue; Row 6: State Revenue; Row 7:
 # Local Revenue; Row 8: Total Expenditure; Row 9: Instruction Expenditure; Row 10: Support Services Expenditure;  Row 11:
 # Other Expenditure; Row 12: Capital Outlay Expenditure; Row 15: Grades 4 G; Row 16: Grades 8 G; Row 21: Avg Math 4 score
+# Row 22: Avg Math 8 Score; In extended, Row 189?: Avg Math 4 Score; Row 190?: Avg Math 8 Score
 def main():
     states_train = []   # Training data
     data_train = []
@@ -40,7 +41,6 @@ def main():
                     datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[21]))
                     targetOrig_test.append(row[22])
                     data_test.append(datalist)
-
 
     del data_train[0]
     del targetOrig_train[0]
@@ -75,22 +75,35 @@ def main():
     print("Mean Squared Error in-sample: " + str(mean_squared_error(target, predictions)))
     print("Mean Squared Error out-of-sample: " + str(mean_squared_error(target_test, predictions_test)))
 
+    y = []
+    x = np.array(range(0, 500))
+    for value in x:
+        total = 0
+        for coef in lm.coef_:
+            total += value*coef
+        y.append(total)
+    y = np.array(y)
+
+    # Create the plot and show
+    plt.plot(x,y)
+    # plt.plot(np.array(range())), targetOrig_train, 'ro')
     plt.plot(np.arange(len(targetOrig_train)), targetOrig_train, 'ro')
-    plt.axis([0, 500, 0, 500])
-
-    plt.plot(np.arange(len(states_train)), predictions)
-    plt.grid(True)
-
     plt.show()
 
-    y_pos = np.arange(len(states_train))
-    plt.bar(y_pos, predictions, align='center', alpha=1)
-    # plt.bar(y_pos, target, align='center', alpha=1)
-    plt.xticks(y_pos, states_train)
-    plt.ylabel('Score')
-    plt.title('Average Math 8 Score')
-
-    plt.show()
+    #
+    # plt.plot(np.arange(len(states_train)), predictions)
+    # plt.grid(True)
+    #
+    # plt.show()
+    #
+    # y_pos = np.arange(len(states_train))
+    # plt.bar(y_pos, predictions, align='center', alpha=1)
+    # # plt.bar(y_pos, target, align='center', alpha=1)
+    # plt.xticks(y_pos, states_train)
+    # plt.ylabel('Score')
+    # plt.title('Average Math 8 Score')
+    #
+    # plt.show()
 
 if __name__ == "__main__":
     main()
