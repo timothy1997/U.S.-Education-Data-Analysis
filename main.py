@@ -13,9 +13,10 @@ import matplotlib.pyplot as plt
 # Other Expenditure; Row 12: Capital Outlay Expenditure; Row 15: Grades 4 G; Row 16: Grades 8 G; Row 21: Avg Math 4 score
 # Row 22: Avg Math 8 Score; In extended, Row 189?: Avg Math 4 Score; Row 190?: Avg Math 8 Score
 def main():
-    states_train = []   # Training data
-    data_train = []
-    targetOrig_train = []
+    # Training data
+    states_train = []   # Holds the state of the corresponding score
+    data_train = [] # Holds the data for that state
+    targetOrig_train = []   # Holds the average math 8 score for that state
 
     states_test = []    # Testing data
     data_test = []
@@ -25,29 +26,25 @@ def main():
     with open('states_all_extended.csv', 'r') as csvfile:    # Read all the relevant data and save it
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
-            if row[1] != '' and row[2] != '' and row[3] != '' and row[4] != '' and row[6] != '' and row[7] != '' and row[8] \
-            != '' and row[9] != '' and row[10] != '' and row[11] != '' and row[12] != '' and row[15] != '' and row[16] != '' \
-            and row[189] != '' and row[190] != '':
-                if i < 430:
-                    datalist = []
-                    states_train.append(row[1])
-                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
-                    targetOrig_train.append(row[190])
-                    data_train.append(datalist)
-                    i += 1
-                else:
-                    datalist = []
-                    states_test.append(row[1])
-                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
-                    targetOrig_test.append(row[190])
-                    data_test.append(datalist)
-
-    del data_train[0]
-    del targetOrig_train[0]
-    del data_test[0]
-    del targetOrig_test[0]
-    del states_train[0]
-    del states_test[0]
+            if i != 0:
+                if row[1] != '' and row[2] != '' and row[3] != '' and row[4] != '' and row[6] != '' and row[7] != '' and row[8] \
+                != '' and row[9] != '' and row[10] != '' and row[11] != '' and row[12] != '' and row[15] != '' and row[16] != '' \
+                and row[189] != '' and row[190] != '':
+                    if i < 300:
+                        datalist = []
+                        states_train.append(row[1])
+                        datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
+                        targetOrig_train.append(row[190])
+                        data_train.append(datalist)
+                        i += 1
+                    else:
+                        datalist = []
+                        states_test.append(row[1])
+                        datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
+                        targetOrig_test.append(row[190])
+                        data_test.append(datalist)
+            else:
+                i += 1
 
     df = pd.DataFrame(data_train, columns=["Year", "Enroll", "Total Revenue", "Federal Revenue", "State Revenue", "Local Revenue", \
     "Total Expenditure", "Instruction Expenditure", "Support Services Expenditure", "Other Expenditure", \
@@ -64,33 +61,58 @@ def main():
     y = target["Average Math 8 Score"]
 
     lm = linear_model.LinearRegression()
-    model = lm.fit(X,y)
+    model = lm.fit(X,y) # Create our model
 
-    predictions = lm.predict(X)
-    predictions_test = lm.predict(X_test)
+    predictions = lm.predict(X) # Make predictions on our training data
+    predictions_test = lm.predict(X_test)   # Make predictions on our testing data
 
+    # Print Results
     print("Results:")
-    print("Score of in-sample error: " + str(lm.score(X, predictions)))
-    print("Score of out-of-sample error: " + str(lm.score(X_test, predictions_test)))
     print("Mean Squared Error in-sample: " + str(mean_squared_error(target, predictions)))
     print("Mean Squared Error out-of-sample: " + str(mean_squared_error(target_test, predictions_test)))
 
-    y = []
-    x = np.array(range(0, 500))
-    for value in x:
-        total = 0
-        for coef in lm.coef_:
-            total += value*coef
-        y.append(total)
-    y = np.array(y)
-
-    # Create the plot and show
-    plt.plot(x,y)
-    # plt.plot(np.array(range())), targetOrig_train, 'ro')
-    plt.plot(np.arange(len(targetOrig_train)), targetOrig_train, 'ro')
+    # Dot Plot Training Data
+    plt.title("Average Math 8 Scores, Training Data")
+    plt.ylabel("Scores")
+    plt.yticks(np.arange(0,500,50))
+    p1 = plt.plot(np.arange(len(predictions)), [float(x) for x in predictions], 'blue')
+    p2 = plt.plot(np.arange(len(targetOrig_train)), [float(x) for x in targetOrig_train], 'ro')
+    plt.legend((p1[0], p2[0]), ('Predictions', 'Target Values'))
     plt.show()
 
-    #
+    # Dot Plot Testing Data
+    plt.title("Average Math 8 Scores, Testing Data")
+    plt.ylabel("Scores")
+    plt.yticks(np.arange(0,500,50))
+    p1 = plt.plot(np.arange(len(predictions_test)), [float(x) for x in predictions_test], 'blue')
+    p2 = plt.plot(np.arange(len(targetOrig_test)), [float(x) for x in targetOrig_test], 'ro')
+    plt.legend((p1[0], p2[0]), ('Predictions', 'Target Values'))
+    plt.show()
+
+    # Bar graph
+    while True:
+        x1 = int(input("X1: "))
+        x2 = int(input("X2: "))
+        N = x2 - x1
+        targetBar = [float(targetOrig_train[i]) for i in range(x1,x2)]
+        predictionsBar = [float(predictions[i]) for i in range(x1,x2)]
+        print(predictionsBar)
+        ind = np.arange(N)
+        width = 0.20
+
+        p2 = plt.bar(ind, predictionsBar, width)
+        p1 = plt.bar(ind, targetBar, width)
+
+        plt.ylabel('Scores')
+        plt.title('Average Math 8 Score, Training Data')
+        plt.xticks(ind, [states_train[i] + '_' + data_train[i][0] for i in range(x1,x2)])
+        plt.yticks(np.arange(0,500,10))
+        plt.legend((p1[0], p2[0]), ('Target Values', 'Predictions'))
+
+        plt.show()
+
+
+
     # plt.plot(np.arange(len(states_train)), predictions)
     # plt.grid(True)
     #
@@ -102,8 +124,8 @@ def main():
     # plt.xticks(y_pos, states_train)
     # plt.ylabel('Score')
     # plt.title('Average Math 8 Score')
-    #
     # plt.show()
+
 
 if __name__ == "__main__":
     main()
