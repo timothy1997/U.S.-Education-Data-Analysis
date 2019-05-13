@@ -22,24 +22,24 @@ def main():
     targetOrig_test = []
 
     i = 0
-    with open('states_all.csv', 'r') as csvfile:    # Read all the relevant data and save it
+    with open('states_all_extended.csv', 'r') as csvfile:    # Read all the relevant data and save it
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             if row[1] != '' and row[2] != '' and row[3] != '' and row[4] != '' and row[6] != '' and row[7] != '' and row[8] \
             != '' and row[9] != '' and row[10] != '' and row[11] != '' and row[12] != '' and row[15] != '' and row[16] != '' \
-            and row[21] != '' and row[22] != '':
+            and row[189] != '' and row[190] != '':
                 if i < 430:
                     datalist = []
                     states_train.append(row[1])
-                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[21]))
-                    targetOrig_train.append(row[22])
+                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
+                    targetOrig_train.append(row[190])
                     data_train.append(datalist)
                     i += 1
                 else:
                     datalist = []
                     states_test.append(row[1])
-                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[21]))
-                    targetOrig_test.append(row[22])
+                    datalist.extend((row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[15], row[16], row[189]))
+                    targetOrig_test.append(row[190])
                     data_test.append(datalist)
 
     del data_train[0]
